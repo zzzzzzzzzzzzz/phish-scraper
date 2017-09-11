@@ -1,0 +1,14 @@
+Bad url error:
+Missing scheme in request url: //www.google.ru/coop/cse/brand?form=cse-search-box&lang=ruBad url error:
+Missing scheme in request url: //www.google.ru/coop/cse/brand?form=cse-search-box&lang=ruBad url error:
+Missing scheme in request url: //www.google.ru/coop/cse/brand?form=cse-search-box&lang=ru
+
+Bad url error:
+Missing scheme in request url: //www.google.ru/coop/cse/brand?form=cse-search-box&lang=ru
+
+Bad url error:
+Missing scheme in request url: //lurkmore.to/api.php?action=rsd
+
+Bad url error:
+Missing scheme in request url: //lurkmore.to/api.php?action=rsd
+
