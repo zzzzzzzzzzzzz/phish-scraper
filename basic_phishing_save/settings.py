@@ -68,7 +68,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'basic_phishing_save.pipelines.BasicPhishingFilesPipeline': 200,
-#    'basic_phishing_save.pipelines.BasicPhishingSavePipeline': 300,
+    'basic_phishing_save.pipelines.WhoisSavePipeline': 300,
     'basic_phishing_save.pipelines.SaveHtmlFilesPipeline': 400,
 }
 FILES_STORE = 'results'

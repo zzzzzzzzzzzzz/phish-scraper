@@ -21,7 +21,11 @@ class PhishSpider(scrapy.Spider):
             self.proxy_iter = round_robin(self.settings['PROXY_LIST'])
 
     def start_requests(self):
-        urls = ['http://www.rbc.ru/',]
+        urls = [
+            'http://www.rbc.ru/',
+            'http://lurkmore.to/',
+            'https://vk.com/'
+        ]
         for url in urls:
             request = scrapy.Request(url=url, callback=self.parse)
             if self.settings['PROXY_LIST']:
