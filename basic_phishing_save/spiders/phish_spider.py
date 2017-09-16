@@ -1,3 +1,5 @@
+from urlparse import urlparse
+
 import scrapy
 from scrapy.utils.project import get_project_settings
 
@@ -16,7 +18,6 @@ class PhishSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(PhishSpider, self).__init__(*args, **kwargs)
         self.settings = get_project_settings()
-        self.counter = 0
         if self.settings['PROXY_LIST']:
             self.proxy_iter = round_robin(self.settings['PROXY_LIST'])
 
@@ -42,9 +43,8 @@ class PhishSpider(scrapy.Spider):
             js_pages.append(js_pages_link)
         for img_link in response.css('img::attr(src)').extract():
             img_pages.append(img_link)
-        self.counter += 1
         yield {
             'file_urls': css_pages + js_pages + img_pages,
             'response': response,
-            'page_number': self.counter,
+            'domain': urlparse(response.url).netloc
         }

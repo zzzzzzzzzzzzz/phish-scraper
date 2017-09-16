@@ -10,44 +10,41 @@ import errno
 from scrapy import Request
 from scrapy.pipelines.files import FilesPipeline
 from urlparse import urlparse, urljoin
-from itertools import izip
+import io
 from BeautifulSoup import BeautifulSoup
 import subprocess
 
 
-def process(url, pn):
+def process(url, domain):
     o = urlparse(url)
     splitted = o.path.split('/')
     folder, name = splitted[:-1], splitted[-1]
     folder = '/'.join(folder)
-    # если захочется как-нибудь их более красиво распихать
-    # if name.lower().split('.')[-1] == 'js':
-    #     folder = 'js/' + ''.join(folder)
-    # else:
-    #     if 'css' in name.lower().split('.')[-1] == 'css':
-    #         folder = 'css/' + ''.join(folder)
-    #     else:
-    #         folder = 'images/' + ''.join(folder)
     return {
         'name': name,
         'path_to_folder': folder,
-        'page_number': pn,
+        'domain': domain
     }
 
 
 class BasicPhishingFilesPipeline(FilesPipeline):
+    def __init__(self, store_uri, download_func=None, settings=None):
+        super(BasicPhishingFilesPipeline, self).__init__(store_uri, download_func, settings)
+        self.domain = 'example.com'
+
     def get_media_requests(self, item, info):
         def append_host(path):
             return urljoin(item['response'].url, path)
 
+        self.domain = urlparse(item['response'].url).netloc
         try:
-            return [Request(append_host(x), meta=process(x, item['page_number']))
+            return [Request(append_host(x), meta=process(x, item['domain']))
                     for x in item.get(self.DEFAULT_FILES_URLS_FIELD, [])]
         except ValueError, e:
             self.log('Bad url error:\n' + str(e) + '\n\n')
 
     def file_path(self, request, response=None, info=None):
-        return '%d/%s/%s' % (request.meta['page_number'], request.meta['path_to_folder'], request.meta['name'])
+        return '%s/%s/%s' % (request.meta['domain'], request.meta['path_to_folder'], request.meta['name'])
 
     def log(self, param):
         with open('process_log.txt', 'a+') as f:
@@ -57,31 +54,33 @@ class BasicPhishingFilesPipeline(FilesPipeline):
 class WhoisSavePipeline(object):
     def process_item(self, item, spider):
         response = item['response']
-        #       Здесь я хотел менять ссылки в исходной странице, но пока не понял как
-        #        for css_pages_link in izip(range(len(css_ready_paths)), response.css('link::attr(href)')):
-        #            css_pages_link.data = css_ready_paths[css_pages_link[0]]
-        #        for js_pages_link in izip(range(len(js_ready_paths)), response.css('script::attr(src)')):
-        #            js_pages_link.data = css_ready_paths[js_pages_link[0]]
-        #        for img_link in izip(range(len(images_ready_paths)), response.css('img::attr(src)')):
-        #            img_link.data = css_ready_paths[img_link[0]
-        host = urlparse(response.url).netloc
-        with open("results/%d/whois.txt" % item['page_number'], "wb+") as out, open("results/%d/whoiserr.txt" % item['page_number'], "wb+") as err:
-            subprocess.Popen(["whois", host],
-                             stdout=out,
-                             stderr=err)
-        with open("results/%d/host.txt" % item['page_number'], "wb+") as out, open("results/%d/hosterr.txt" % item['page_number'], "wb+") as err:
-            subprocess.Popen(["host", host],
-                             stdout=out,
-                             stderr=err)
+        domain = urlparse(item['response'].url).netloc
+
+        filename = "results/%s/whois.txt" % domain
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with io.open(filename, "w") as out:
+            subprocess.Popen(["whois", domain],
+                             stdout=out)
+
+        filename = "results/%s/host.txt" % domain
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with io.open(filename, "w") as out:
+            subprocess.Popen(["host", domain],
+                             stdout=out)
+
         return {
-            'response': response, # исторически осталось
-            'page_number': item['page_number']
+            'response': response,
+            'domain': domain
         }
 
 
 class SaveHtmlFilesPipeline(object):
     def process_item(self, item, spider):
-        filename = 'results/%d/index.html' % item['page_number']
+        filename = 'results/%s/index.html' % item['domain']
         soup = BeautifulSoup(item['response'].body)
         for link in soup.findAll('link'):
             if link.has_key('href'):
@@ -101,8 +100,7 @@ class SaveHtmlFilesPipeline(object):
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        with open(filename, 'w+') as f:
-            f.write(
-                str(soup))  # превращаем абсолютные пути в относительные
-                                                                          # Ещё надо сделать так, чтобы пути типо /abc/defg/a.html
-                                                                          # Превратились в abc/defg/a.html
+        with io.open(filename, 'w+') as f:
+            f.write(unicode(soup))  # превращаем абсолютные пути в относительные
+            # Ещё надо сделать так, чтобы пути типо /abc/defg/a.html
+            # Превратились в abc/defg/a.html
