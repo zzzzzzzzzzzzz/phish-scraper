@@ -1,5 +1,6 @@
 from urlparse import urlparse
 
+import io
 import scrapy
 from scrapy.utils.project import get_project_settings
 
@@ -18,16 +19,18 @@ class PhishSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(PhishSpider, self).__init__(*args, **kwargs)
         self.settings = get_project_settings()
+        self.urls = []
+        if 'filename' not in kwargs:
+            print "\n\nYou haven't specified filename with urls!\n\n"
+        else:
+            with open(kwargs['filename'], "r") as input:
+                self.urls = [line.rstrip('\n') for line in input]
+        print self.urls
         if self.settings['PROXY_LIST']:
             self.proxy_iter = round_robin(self.settings['PROXY_LIST'])
 
     def start_requests(self):
-        urls = [
-            'http://www.rbc.ru/',
-            'http://lurkmore.to/',
-            'https://vk.com/'
-        ]
-        for url in urls:
+        for url in self.urls:
             request = scrapy.Request(url=url, callback=self.parse)
             if self.settings['PROXY_LIST']:
                 request.meta['proxy'] = next(self.proxy_iter)

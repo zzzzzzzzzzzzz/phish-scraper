@@ -27,6 +27,5 @@ scrapy-random-useragent==0.2
 service-identity==17.0.0
 six==1.10.0
 Twisted==17.5.0
-urllib2==1498656401.94
 w3lib==1.18.0
 zope.interface==4.4.2
