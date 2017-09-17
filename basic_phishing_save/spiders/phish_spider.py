@@ -25,7 +25,6 @@ class PhishSpider(scrapy.Spider):
         else:
             with open(kwargs['filename'], "r") as input:
                 self.urls = [line.rstrip('\n') for line in input]
-        print self.urls
         if self.settings['PROXY_LIST']:
             self.proxy_iter = round_robin(self.settings['PROXY_LIST'])
 

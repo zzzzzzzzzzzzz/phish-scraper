@@ -60,7 +60,7 @@ class WhoisSavePipeline(object):
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        with io.open(filename, "w") as out:
+        with io.open(filename, "w+") as out:
             subprocess.Popen(["whois", domain],
                              stdout=out)
 
@@ -68,7 +68,7 @@ class WhoisSavePipeline(object):
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        with io.open(filename, "w") as out:
+        with io.open(filename, "w+") as out:
             subprocess.Popen(["host", domain],
                              stdout=out)
 
