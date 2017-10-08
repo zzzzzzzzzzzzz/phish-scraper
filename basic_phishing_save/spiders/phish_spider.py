@@ -19,7 +19,9 @@ class PhishSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(PhishSpider, self).__init__(*args, **kwargs)
         self.settings = get_project_settings()
-        self.urls = []
+        self.urls = ['https://yandex.ru/',
+                     'https://vk.com/']
+        self.url_number = 0
         if 'filename' not in kwargs:
             print "\n\nYou haven't specified filename with urls!\n\n"
         else:
@@ -45,8 +47,10 @@ class PhishSpider(scrapy.Spider):
             js_pages.append(js_pages_link)
         for img_link in response.css('img::attr(src)').extract():
             img_pages.append(img_link)
+
+        self.url_number += 1
         yield {
             'file_urls': css_pages + js_pages + img_pages,
             'response': response,
-            'domain': urlparse(response.url).netloc
+            'url_number': self.url_number
         }

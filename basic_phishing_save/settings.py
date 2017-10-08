@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     'basic_phishing_save.pipelines.BasicPhishingFilesPipeline': 200,
     'basic_phishing_save.pipelines.WhoisSavePipeline': 300,
-    'basic_phishing_save.pipelines.SaveHtmlFilesPipeline': 400,
+    'basic_phishing_save.pipelines.SaveHtmlFilesAndProcessFeaturesPipeline': 400,
 }
 FILES_STORE = 'results'
 PROXY_LIST = []
