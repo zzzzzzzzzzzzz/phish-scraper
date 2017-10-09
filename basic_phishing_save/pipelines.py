@@ -19,6 +19,7 @@ from BeautifulSoup import BeautifulSoup
 import subprocess
 import requests
 from IPy import IP
+import csv
 
 
 def url_analyse(url):
@@ -298,10 +299,12 @@ class SaveHtmlFilesAndProcessFeaturesPipeline(object):
                     features['request_url'] = 0
                 img['src'] = o.path[1:]
 
-        filename = 'results/%s/features.txt' % item['url_number']
+        filename = 'results/%s/features.csv' % item['url_number']
         features = dict(features, **url_features)
-        with io.open(filename, 'w+') as f:
-            f.write(unicode(features))
+        with io.open(filename, 'wb') as f:
+            w = csv.DictWriter(f, features.keys())
+            w.writeheader()
+            w.writerow(features)
 
         filename = 'results/%s/index.html' % item['url_number']
         if not os.path.exists(os.path.dirname(filename)):
@@ -327,9 +330,11 @@ class ExternalInfoSpiderPipeline(object):
             if len(res.text) > 0:
                 features['google_index'] = 1
 
-        filename = 'results/%s/external_features.txt' % item['url_number']
+        filename = 'results/%s/external_features.csv' % item['url_number']
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        with io.open(filename, 'w+') as f:
-            f.write(unicode(features))
+        with io.open(filename, 'wb') as f:
+            w = csv.DictWriter(f, features.keys())
+            w.writeheader()
+            w.writerow(features)
