@@ -1,6 +1,3 @@
-from urlparse import urlparse
-
-import io
 import scrapy
 from scrapy.utils.project import get_project_settings
 
@@ -20,7 +17,8 @@ class PhishSpider(scrapy.Spider):
         super(PhishSpider, self).__init__(*args, **kwargs)
         self.settings = get_project_settings()
         self.urls = ['https://yandex.ru/',
-                     'https://vk.com/']
+                     'https://vk.com/',
+                     'https://suspicious254.000webhostapp.com/info-account.html?login-your-fbaccount=65965344']
         self.url_number = 0
         if 'filename' not in kwargs:
             print "\n\nYou haven't specified filename with urls!\n\n"
@@ -36,6 +34,7 @@ class PhishSpider(scrapy.Spider):
             if self.settings['PROXY_LIST']:
                 request.meta['proxy'] = next(self.proxy_iter)
             yield request
+
 
     def parse(self, response):
         css_pages = []
