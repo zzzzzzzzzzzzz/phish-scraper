@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.utils.project import get_project_settings
 
-from phish_spider import round_robin
+from .phish_spider import round_robin
 
 
 class ExternalInfoSpider(scrapy.Spider):
@@ -15,14 +15,10 @@ class ExternalInfoSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(ExternalInfoSpider, self).__init__(*args, **kwargs)
         self.settings = get_project_settings()
-        self.urls = [
-                'https://google.com/search?q=site:https://yandex.ru/',
-                'https://google.com/search?q=site:https://vk.com/',
-                'https://google.com/search?q=site:https://suspicious254.000webhostapp.com/info-account.html?login-your-fbaccount=65965344'
-        ]
+        self.urls = []
         self.url_number = 0
         if 'filename' not in kwargs:
-            print "\n\nYou haven't specified filename with urls!\n\n"
+            print("\n\nYou haven't specified filename with urls!\n\n")
         else:
             with open(kwargs['filename'], "r") as input:
                 self.urls = [line.rstrip('\n') for line in input]
