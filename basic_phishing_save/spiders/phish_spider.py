@@ -36,23 +36,12 @@ class PhishSpider(scrapy.Spider):
             yield request
 
     def parse(self, response):
-        # css_pages = []
-        # js_pages = []
-        # img_pages = []
-        # for css_pages_link in response.css('link::attr(href)').extract():
-        #     css_pages.append(css_pages_link)
-        # for js_pages_link in response.css('script::attr(src)').extract():
-        #     js_pages.append(js_pages_link)
-        # for img_link in response.css('img::attr(src)').extract():
-        #     img_pages.append(img_link)
-
         if response.status == 404:
             print("Drop 404 status")
 
         if response.status == 200:
             self.url_number += 1
             yield {
-                #    'file_urls': css_pages + js_pages + img_pages,
                 'response': response,
                 'url_number': self.url_number,
                 'redirect_count': self.redirect_counter
